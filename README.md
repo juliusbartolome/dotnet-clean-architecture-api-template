@@ -1,6 +1,6 @@
 # dotnet-clean-architecture-api-template
 
-Production-oriented .NET 9 Web API template using Clean Architecture, CQRS, validation pipelines, SQL Server + Redis, JWT auth, structured logging, health checks, Docker, and CI.
+Production-oriented .NET 9 Web API template using Clean Architecture, CQRS, validation pipelines, SQL Server/SQLite + Redis, JWT auth, structured logging, health checks, Docker, and CI.
 
 ## Architecture
 
@@ -21,7 +21,7 @@ Production-oriented .NET 9 Web API template using Clean Architecture, CQRS, vali
                │ abstractions
 ┌──────────────▼────────────────┐
 │      Template.Infrastructure   │
-│  - EF Core (SQL Server)       │
+│  - EF Core (SQL Server/SQLite)│
 │  - Redis distributed cache     │
 │  - Health checks               │
 └──────────────┬────────────────┘
@@ -109,12 +109,24 @@ dotnet run --project src/Template.Api/Template.Api.csproj
 ### Environment variables
 
 ```bash
+# Optional: override DB provider (default is SqlServer when unset).
+export Database__Provider="SqlServer"
+
+# Required when Database__Provider=SqlServer.
 export ConnectionStrings__DefaultConnection="Server=localhost,1433;Database=TemplateDb;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=True"
+
+# Required when Database__Provider=Sqlite.
+export ConnectionStrings__Sqlite="Data Source=template.db"
+
 export ConnectionStrings__Redis="localhost:6379"
 export Jwt__Issuer="Template.Api"
 export Jwt__Audience="Template.Client"
 export Jwt__SigningKey="dev-only-signing-key-change-this-to-at-least-32-characters"
 ```
+
+Notes:
+- `appsettings.Development.json` defaults to `Database:Provider=Sqlite` with `ConnectionStrings:Sqlite=Data Source=template.dev.db`.
+- If you switch to SQL Server locally, set `Database__Provider=SqlServer` and provide `ConnectionStrings__DefaultConnection`.
 
 ## EF Core migrations
 
@@ -134,8 +146,22 @@ docker compose up --build
 
 ```bash
 dotnet test tests/Template.UnitTests/Template.UnitTests.csproj
+TESTCONTAINERS_MSSQL_IMAGE="mcr.microsoft.com/mssql/server:2022-latest" \
+TESTCONTAINERS_REDIS_IMAGE="redis:7-alpine" \
+TESTCONTAINERS_MSSQL_PASSWORD="YourStrong!Passw0rd" \
 dotnet test tests/Template.IntegrationTests/Template.IntegrationTests.csproj
 ```
+
+Integration tests require:
+- `TESTCONTAINERS_MSSQL_IMAGE`
+- `TESTCONTAINERS_REDIS_IMAGE`
+- `TESTCONTAINERS_MSSQL_PASSWORD`
+
+## CI
+
+- CI runs on pushes to `main` and on pull requests.
+- Workflow uses GitHub Environment `ci`.
+- Define `TESTCONTAINERS_MSSQL_PASSWORD` in the `ci` environment secrets.
 
 ## Key decisions
 
