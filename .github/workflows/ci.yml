@@ -36,11 +36,13 @@ jobs:
         run: dotnet test tests/Template.UnitTests/Template.UnitTests.csproj --configuration Release --no-build
 
       - name: Pre-pull integration test images
+        if: ${{ env.ACT != 'true' }}
         run: |
-          docker pull mcr.microsoft.com/mssql/server:2022-latest
+          docker pull mcr.microsoft.com/mssql/server:2022-CU14-ubuntu-22.04
           docker pull redis:7-alpine
 
       - name: Integration tests
+        if: ${{ env.ACT != 'true' }}
         env:
           TESTCONTAINERS_WAIT_STRATEGY_TIMEOUT: 00:03:00
         run: dotnet test tests/Template.IntegrationTests/Template.IntegrationTests.csproj --configuration Release --no-build

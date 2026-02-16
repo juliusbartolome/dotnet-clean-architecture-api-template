@@ -52,7 +52,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ICacheVersionService, CacheVersionService>();
 
         services.AddHealthChecks()
-            .AddDbContextCheck<TemplateDbContext>(name: "sqlserver", failureStatus: HealthStatus.Unhealthy)
+            .AddDbContextCheck<TemplateDbContext>(name: "database", failureStatus: HealthStatus.Unhealthy)
             .AddCheck<RedisConnectivityHealthCheck>("redis", failureStatus: HealthStatus.Degraded);
 
         return services;
