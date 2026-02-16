@@ -1,14 +1,14 @@
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
-using Microsoft.AspNetCore.Authentication;
+using Template.Infrastructure.Persistence;
 using Testcontainers.MsSql;
 using Testcontainers.Redis;
-using Template.Infrastructure.Persistence;
 
 namespace Template.IntegrationTests.Common;
 

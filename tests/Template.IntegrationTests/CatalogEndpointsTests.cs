@@ -20,7 +20,7 @@ public sealed class CatalogEndpointsTests(IntegrationTestFactory factory) : ICla
     public async Task CreateProduct_HappyPath_ShouldReturnCreated()
     {
         var token = GenerateToken();
-        _client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+        _client.DefaultRequestHeaders.Authorization = new("Bearer", token);
 
         var payload = new
         {
@@ -40,7 +40,7 @@ public sealed class CatalogEndpointsTests(IntegrationTestFactory factory) : ICla
     public async Task CreateProduct_InvalidPayload_ShouldReturnValidationProblem()
     {
         var token = GenerateToken();
-        _client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+        _client.DefaultRequestHeaders.Authorization = new("Bearer", token);
 
         var payload = new
         {
