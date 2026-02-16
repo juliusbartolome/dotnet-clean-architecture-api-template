@@ -1,7 +1,11 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Authentication;
 using Testcontainers.MsSql;
 using Testcontainers.Redis;
 using Template.Infrastructure.Persistence;
@@ -34,6 +38,22 @@ public sealed class IntegrationTestFactory : WebApplicationFactory<Program>, IAs
             };
 
             configBuilder.AddInMemoryCollection(settings);
+        });
+
+        builder.ConfigureServices(services =>
+        {
+            services.RemoveAll(typeof(IConfigureOptions<AuthenticationOptions>));
+            services.RemoveAll(typeof(IConfigureOptions<Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerOptions>));
+
+            services.AddAuthentication(options =>
+                {
+                    options.DefaultAuthenticateScheme = "Test";
+                    options.DefaultChallengeScheme = "Test";
+                })
+                .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>("Test", _ => { });
+
+            services.RemoveAll(typeof(IDistributedCache));
+            services.AddDistributedMemoryCache();
         });
     }
 
