@@ -11,7 +11,7 @@ namespace Template.IntegrationTests.Common;
 public sealed class IntegrationTestFactory : WebApplicationFactory<Program>, IAsyncLifetime
 {
     private readonly MsSqlContainer _sqlContainer = new MsSqlBuilder()
-        .WithImage("mcr.microsoft.com/mssql/server:2022-latest")
+        .WithImage("mcr.microsoft.com/mssql/server:2022-CU14-ubuntu-22.04")
         .WithPassword("YourStrong!Passw0rd")
         .Build();
 
@@ -27,7 +27,7 @@ public sealed class IntegrationTestFactory : WebApplicationFactory<Program>, IAs
             var settings = new Dictionary<string, string?>
             {
                 ["ConnectionStrings:DefaultConnection"] = _sqlContainer.GetConnectionString(),
-                ["ConnectionStrings:Redis"] = _redisContainer.GetConnectionString(),
+                ["ConnectionStrings:Redis"] = $"{_redisContainer.Hostname}:{_redisContainer.GetMappedPublicPort(6379)}",
                 ["Jwt:Issuer"] = "Template.Api",
                 ["Jwt:Audience"] = "Template.Client",
                 ["Jwt:SigningKey"] = "integration-tests-signing-key-at-least-32-characters"
