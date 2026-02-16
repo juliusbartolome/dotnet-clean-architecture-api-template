@@ -1,0 +1,39 @@
+name: ci
+
+on:
+  push:
+    branches: ["main", "master"]
+  pull_request:
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Cache NuGet
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Restore
+        run: dotnet restore dotnet-clean-architecture-api-template.sln
+
+      - name: Build
+        run: dotnet build dotnet-clean-architecture-api-template.sln --configuration Release --no-restore
+
+      - name: Unit tests
+        run: dotnet test tests/Template.UnitTests/Template.UnitTests.csproj --configuration Release --no-build
+
+      - name: Integration tests
+        run: dotnet test tests/Template.IntegrationTests/Template.IntegrationTests.csproj --configuration Release --no-build
