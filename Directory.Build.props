@@ -4,5 +4,6 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <LangVersion>latest</LangVersion>
+    <NuGetAudit>false</NuGetAudit>
   </PropertyGroup>
 </Project>

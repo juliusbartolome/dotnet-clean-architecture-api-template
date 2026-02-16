@@ -4,29 +4,29 @@
 
 ```text
 Client
-  -> Template.Api (Minimal API, auth, middleware, Swagger, health checks)
+  -> LaunchpadStarter.Api (Minimal API, auth, middleware, Swagger, health checks)
   -> MediatR
-  -> Template.Application (CQRS handlers, validators, pipeline behaviors, Result model)
+  -> LaunchpadStarter.Application (CQRS handlers, validators, pipeline behaviors, Result model)
   -> Abstractions (IApplicationDbContext, ICacheService, ICacheVersionService)
-  -> Template.Infrastructure (EF Core SQL Server/SQLite, Redis cache, health checks)
-  -> Template.Domain (Product entity, domain events)
+  -> LaunchpadStarter.Infrastructure (EF Core SQL Server/SQLite, Redis cache, health checks)
+  -> LaunchpadStarter.Domain (Product entity, domain events)
 ```
 
 Core idea: API is thin, use-cases live in Application, technical details live in Infrastructure, and business state/behavior live in Domain.
 
 ## 2) Project Boundaries
 
-- `src/Template.Api`
+- `src/LaunchpadStarter.Api`
   - HTTP transport only: endpoints, auth policies, middleware, exception mapping.
   - No business rules.
-- `src/Template.Application`
+- `src/LaunchpadStarter.Application`
   - Business use-cases (commands/queries), validation, and cross-cutting MediatR behaviors.
   - Depends only on abstractions and domain.
-- `src/Template.Infrastructure`
+- `src/LaunchpadStarter.Infrastructure`
   - EF Core provider wiring (SQL Server or SQLite), Redis cache implementation, health checks, DI registration.
-- `src/Template.Domain`
+- `src/LaunchpadStarter.Domain`
   - `Product` aggregate-like entity + domain event type.
-- `tests/Template.UnitTests`, `tests/Template.IntegrationTests`
+- `tests/LaunchpadStarter.UnitTests`, `tests/LaunchpadStarter.IntegrationTests`
   - Handler/validator unit tests and endpoint integration tests with Testcontainers + test auth scheme.
 
 ## 3) Request Lifecycle (Write Path)
@@ -98,11 +98,11 @@ Example: `POST /api/v1/products`
 
 - Infrastructure reads `Database:Provider` and supports:
   - `SqlServer` using `ConnectionStrings:DefaultConnection` with retry-on-failure.
-  - `Sqlite` using `ConnectionStrings:Sqlite` (fallback `Data Source=template.db`).
+  - `Sqlite` using `ConnectionStrings:Sqlite` (fallback `Data Source=launchpadstarter.db`).
 - Default provider is `SqlServer` if `Database:Provider` is not set.
-- Development configuration (`src/Template.Api/appsettings.Development.json`) now sets:
+- Development configuration (`src/LaunchpadStarter.Api/appsettings.Development.json`) now sets:
   - `Database:Provider=Sqlite`
-  - `ConnectionStrings:Sqlite=Data Source=template.dev.db`
+  - `ConnectionStrings:Sqlite=Data Source=launchpadstarter.dev.db`
 
 ## 9) Catalog Feature Matrix
 
@@ -127,7 +127,7 @@ Product fields:
 - Test host replaces distributed cache with in-memory cache for deterministic behavior.
 - Current integration tests still attach bearer tokens in requests, but authentication is handled by the injected `Test` scheme.
 
-## 12) Why This Template Works Well Publicly
+## 12) Why This LaunchpadStarter Works Well Publicly
 
 - Demonstrates clear architectural separation instead of a monolithic API layer.
 - Shows real production concerns (auth, caching, health, observability, rate limits).
@@ -149,4 +149,4 @@ Latest updates now reflected in this document:
 
 ## 14) 30-Second Pinned-Repo Pitch
 
-Production-oriented .NET 9 Clean Architecture API template with a complete Catalog vertical slice. It combines Minimal APIs, CQRS with MediatR, FluentValidation pipeline behaviors, EF Core persistence with SQL Server/SQLite support, Redis caching with explicit invalidation, JWT scope-based authorization, health checks, rate limiting, structured logging, Dockerized local stack, and CI-backed unit/integration tests.
+Production-oriented .NET 9 Clean Architecture API launchpad starter with a complete Catalog vertical slice. It combines Minimal APIs, CQRS with MediatR, FluentValidation pipeline behaviors, EF Core persistence with SQL Server/SQLite support, Redis caching with explicit invalidation, JWT scope-based authorization, health checks, rate limiting, structured logging, Dockerized local stack, and CI-backed unit/integration tests.

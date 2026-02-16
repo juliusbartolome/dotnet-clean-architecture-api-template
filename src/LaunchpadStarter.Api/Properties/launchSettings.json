@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json.schemastore.org/launchsettings.json",
+  "profiles": {
+    "LaunchpadStarter.Api": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "launchBrowser": false,
+      "applicationUrl": "http://localhost:5158",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ConnectionStrings__DefaultConnection": "Server=localhost,1433;Database=LaunchpadStarterDb;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=True",
+        "ConnectionStrings__Redis": "localhost:6379",
+        "Jwt__Issuer": "LaunchpadStarter.Api",
+        "Jwt__Audience": "LaunchpadStarter.Client",
+        "Jwt__SigningKey": "dev-only-signing-key-change-this-to-at-least-32-characters"
+      }
+    }
+  }
+}

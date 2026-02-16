@@ -3,13 +3,13 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: template-api
+    container_name: launchpadstarter-api
     environment:
       ASPNETCORE_ENVIRONMENT: Development
-      ConnectionStrings__DefaultConnection: Server=sqlserver,1433;Database=TemplateDb;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=True
+      ConnectionStrings__DefaultConnection: Server=sqlserver,1433;Database=LaunchpadStarterDb;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=True
       ConnectionStrings__Redis: redis:6379
-      Jwt__Issuer: Template.Api
-      Jwt__Audience: Template.Client
+      Jwt__Issuer: LaunchpadStarter.Api
+      Jwt__Audience: LaunchpadStarter.Client
       Jwt__SigningKey: dev-only-signing-key-change-this-to-at-least-32-characters
     ports:
       - "8080:8080"
@@ -19,7 +19,7 @@ services:
 
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: template-sqlserver
+    container_name: launchpadstarter-sqlserver
     environment:
       ACCEPT_EULA: "Y"
       SA_PASSWORD: "YourStrong!Passw0rd"
@@ -33,6 +33,6 @@ services:
 
   redis:
     image: redis:7-alpine
-    container_name: template-redis
+    container_name: launchpadstarter-redis
     ports:
       - "6379:6379"

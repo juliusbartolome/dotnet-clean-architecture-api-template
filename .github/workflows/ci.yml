@@ -50,15 +50,15 @@ jobs:
 
       - name: Restore
         if: steps.changes.outputs.dotnet == 'true'
-        run: dotnet restore dotnet-clean-architecture-api-template.sln
+        run: dotnet restore dotnet-clean-architecture-api-launchpad-starter.sln
 
       - name: Build
         if: steps.changes.outputs.dotnet == 'true'
-        run: dotnet build dotnet-clean-architecture-api-template.sln --configuration Release --no-restore
+        run: dotnet build dotnet-clean-architecture-api-launchpad-starter.sln --configuration Release --no-restore
 
       - name: Unit tests
         if: steps.changes.outputs.dotnet == 'true'
-        run: dotnet test tests/Template.UnitTests/Template.UnitTests.csproj --configuration Release --no-build
+        run: dotnet test tests/LaunchpadStarter.UnitTests/LaunchpadStarter.UnitTests.csproj --configuration Release --no-build
 
       - name: Pre-pull integration test images
         if: steps.changes.outputs.dotnet == 'true' && env.ACT != 'true'
@@ -70,4 +70,4 @@ jobs:
         if: steps.changes.outputs.dotnet == 'true' && env.ACT != 'true'
         env:
           TESTCONTAINERS_WAIT_STRATEGY_TIMEOUT: 00:03:00
-        run: dotnet test tests/Template.IntegrationTests/Template.IntegrationTests.csproj --configuration Release --no-build
+        run: dotnet test tests/LaunchpadStarter.IntegrationTests/LaunchpadStarter.IntegrationTests.csproj --configuration Release --no-build

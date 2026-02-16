@@ -1,48 +1,48 @@
-# dotnet-clean-architecture-api-template
+# dotnet-clean-architecture-api-launchpad-starter
 
-Production-oriented .NET 9 Web API template using Clean Architecture, CQRS, validation pipelines, SQL Server/SQLite + Redis, JWT auth, structured logging, health checks, Docker, and CI.
+Production-oriented .NET 9 Web API launchpad starter using Clean Architecture, CQRS, validation pipelines, SQL Server/SQLite + Redis, JWT auth, structured logging, health checks, Docker, and CI.
 
 ## Architecture
 
 ```text
-┌───────────────────────────────┐
-│           Template.Api        │
-│  - Minimal API endpoints      │
-│  - Auth / middleware / docs   │
-└──────────────┬────────────────┘
-               │ MediatR
-┌──────────────▼────────────────┐
-│       Template.Application     │
-│  - Use cases (CQRS)           │
-│  - Validators                 │
-│  - Pipeline behaviors         │
-│  - Result/Error model         │
-└──────────────┬────────────────┘
-               │ abstractions
-┌──────────────▼────────────────┐
-│      Template.Infrastructure   │
-│  - EF Core (SQL Server/SQLite)│
-│  - Redis distributed cache     │
-│  - Health checks               │
-└──────────────┬────────────────┘
-               │
-┌──────────────▼────────────────┐
-│        Template.Domain         │
-│  - Entities + domain events    │
-└───────────────────────────────┘
+┌──────────────────────────────────────────┐
+│            LaunchpadStarter.Api          │
+│  - Minimal API endpoints                 │
+│  - Auth / middleware / docs              │
+└───────────────────┬──────────────────────┘
+                    │ MediatR
+┌───────────────────▼──────────────────────┐
+│        LaunchpadStarter.Application      │
+│  - Use cases (CQRS)                      │
+│  - Validators                            │
+│  - Pipeline behaviors                    │
+│  - Result/Error model                    │
+└───────────────────┬──────────────────────┘
+                    │ abstractions
+┌───────────────────▼──────────────────────┐
+│       LaunchpadStarter.Infrastructure    │
+│  - EF Core (SQL Server/SQLite)           │
+│  - Redis distributed cache               │
+│  - Health checks                         │
+└───────────────────┬──────────────────────┘
+                    │
+┌───────────────────▼──────────────────────┐
+│           LaunchpadStarter.Domain        │
+│  - Entities + domain events              │
+└──────────────────────────────────────────┘
 ```
 
 ## Project structure
 
 ```text
 src/
-  Template.Domain/
-  Template.Application/
-  Template.Infrastructure/
-  Template.Api/
+  LaunchpadStarter.Domain/
+  LaunchpadStarter.Application/
+  LaunchpadStarter.Infrastructure/
+  LaunchpadStarter.Api/
 tests/
-  Template.UnitTests/
-  Template.IntegrationTests/
+  LaunchpadStarter.UnitTests/
+  LaunchpadStarter.IntegrationTests/
 .github/workflows/ci.yml
 Dockerfile
 docker-compose.yml
@@ -101,9 +101,9 @@ Uses `IDistributedCache` (Redis) with TTL.
 ## Run locally
 
 ```bash
-dotnet restore dotnet-clean-architecture-api-template.sln
-dotnet build dotnet-clean-architecture-api-template.sln
-dotnet run --project src/Template.Api/Template.Api.csproj
+dotnet restore dotnet-clean-architecture-api-launchpad-starter.sln
+dotnet build dotnet-clean-architecture-api-launchpad-starter.sln
+dotnet run --project src/LaunchpadStarter.Api/LaunchpadStarter.Api.csproj
 ```
 
 ### Environment variables
@@ -113,27 +113,27 @@ dotnet run --project src/Template.Api/Template.Api.csproj
 export Database__Provider="SqlServer"
 
 # Required when Database__Provider=SqlServer.
-export ConnectionStrings__DefaultConnection="Server=localhost,1433;Database=TemplateDb;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=True"
+export ConnectionStrings__DefaultConnection="Server=localhost,1433;Database=LaunchpadStarterDb;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=True"
 
 # Required when Database__Provider=Sqlite.
-export ConnectionStrings__Sqlite="Data Source=template.db"
+export ConnectionStrings__Sqlite="Data Source=launchpadstarter.db"
 
 export ConnectionStrings__Redis="localhost:6379"
-export Jwt__Issuer="Template.Api"
-export Jwt__Audience="Template.Client"
+export Jwt__Issuer="LaunchpadStarter.Api"
+export Jwt__Audience="LaunchpadStarter.Client"
 export Jwt__SigningKey="dev-only-signing-key-change-this-to-at-least-32-characters"
 ```
 
 Notes:
-- `appsettings.Development.json` defaults to `Database:Provider=Sqlite` with `ConnectionStrings:Sqlite=Data Source=template.dev.db`.
+- `appsettings.Development.json` defaults to `Database:Provider=Sqlite` with `ConnectionStrings:Sqlite=Data Source=launchpadstarter.dev.db`.
 - If you switch to SQL Server locally, set `Database__Provider=SqlServer` and provide `ConnectionStrings__DefaultConnection`.
 
 ## EF Core migrations
 
 ```bash
 dotnet tool install --global dotnet-ef
-dotnet ef migrations add InitialCreate --project src/Template.Infrastructure --startup-project src/Template.Api
-dotnet ef database update --project src/Template.Infrastructure --startup-project src/Template.Api
+dotnet ef migrations add InitialCreate --project src/LaunchpadStarter.Infrastructure --startup-project src/LaunchpadStarter.Api
+dotnet ef database update --project src/LaunchpadStarter.Infrastructure --startup-project src/LaunchpadStarter.Api
 ```
 
 ## Docker compose
@@ -145,11 +145,11 @@ docker compose up --build
 ## Tests
 
 ```bash
-dotnet test tests/Template.UnitTests/Template.UnitTests.csproj
+dotnet test tests/LaunchpadStarter.UnitTests/LaunchpadStarter.UnitTests.csproj
 TESTCONTAINERS_MSSQL_IMAGE="mcr.microsoft.com/mssql/server:2022-latest" \
 TESTCONTAINERS_REDIS_IMAGE="redis:7-alpine" \
 TESTCONTAINERS_MSSQL_PASSWORD="YourStrong!Passw0rd" \
-dotnet test tests/Template.IntegrationTests/Template.IntegrationTests.csproj
+dotnet test tests/LaunchpadStarter.IntegrationTests/LaunchpadStarter.IntegrationTests.csproj
 ```
 
 Integration tests require:
