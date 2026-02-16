@@ -12,34 +12,15 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        var databaseProvider = configuration["Database:Provider"] ?? "SqlServer";
-        var provider = databaseProvider.Trim().ToLowerInvariant();
-
         services.AddDbContext<LaunchpadStarterDbContext>(options =>
         {
-            switch (provider)
-            {
-                case "sqlserver":
-                {
-                    var connectionString = configuration.GetConnectionString("DefaultConnection")
-                        ?? throw new InvalidOperationException("Connection string 'DefaultConnection' was not found.");
+            var connectionString = configuration.GetConnectionString("DefaultConnection")
+                ?? throw new InvalidOperationException("Connection string 'DefaultConnection' was not found.");
 
-                    options.UseSqlServer(connectionString, sqlServerOptions =>
-                    {
-                        sqlServerOptions.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
-                    });
-                    break;
-                }
-                case "sqlite":
-                {
-                    var sqliteConnection = configuration.GetConnectionString("Sqlite") ?? "Data Source=launchpadstarter.db";
-                    options.UseSqlite(sqliteConnection);
-                    break;
-                }
-                default:
-                    throw new InvalidOperationException(
-                        $"Unsupported database provider '{databaseProvider}'. Supported values are 'SqlServer' and 'Sqlite'.");
-            }
+            options.UseSqlServer(connectionString, sqlServerOptions =>
+            {
+                sqlServerOptions.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
+            });
         });
 
         services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<LaunchpadStarterDbContext>());

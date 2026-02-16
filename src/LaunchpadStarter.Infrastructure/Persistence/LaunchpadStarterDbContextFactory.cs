@@ -7,8 +7,16 @@ public sealed class LaunchpadStarterDbContextFactory : IDesignTimeDbContextFacto
 {
     public LaunchpadStarterDbContext CreateDbContext(string[] args)
     {
+        var connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection");
+        if (string.IsNullOrWhiteSpace(connectionString))
+        {
+            throw new InvalidOperationException(
+                "Connection string 'DefaultConnection' was not found. Set environment variable 'ConnectionStrings__DefaultConnection'.");
+        }
+
         var optionsBuilder = new DbContextOptionsBuilder<LaunchpadStarterDbContext>();
-        optionsBuilder.UseSqlServer("Server=localhost,1433;Database=LaunchpadStarterDb;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=True");
+        optionsBuilder.UseSqlServer(connectionString);
+
         return new LaunchpadStarterDbContext(optionsBuilder.Options);
     }
 }

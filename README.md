@@ -109,14 +109,8 @@ dotnet run --project src/LaunchpadStarter.Api/LaunchpadStarter.Api.csproj
 ### Environment variables
 
 ```bash
-# Optional: override DB provider (default is SqlServer when unset).
-export Database__Provider="SqlServer"
-
-# Required when Database__Provider=SqlServer.
+# Required.
 export ConnectionStrings__DefaultConnection="Server=localhost,1433;Database=LaunchpadStarterDb;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=True"
-
-# Required when Database__Provider=Sqlite.
-export ConnectionStrings__Sqlite="Data Source=launchpadstarter.db"
 
 export ConnectionStrings__Redis="localhost:6379"
 export Jwt__Issuer="LaunchpadStarter.Api"
@@ -125,8 +119,7 @@ export Jwt__SigningKey="dev-only-signing-key-change-this-to-at-least-32-characte
 ```
 
 Notes:
-- `appsettings.Development.json` defaults to `Database:Provider=Sqlite` with `ConnectionStrings:Sqlite=Data Source=launchpadstarter.dev.db`.
-- If you switch to SQL Server locally, set `Database__Provider=SqlServer` and provide `ConnectionStrings__DefaultConnection`.
+- The application is configured to use SQL Server only.
 
 ## EF Core migrations
 
