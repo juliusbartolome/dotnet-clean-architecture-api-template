@@ -14,11 +14,15 @@ namespace Template.IntegrationTests.Common;
 
 public sealed class IntegrationTestFactory : WebApplicationFactory<Program>, IAsyncLifetime
 {
-    private readonly MsSqlContainer _sqlContainer = new MsSqlBuilder("mcr.microsoft.com/mssql/server:2022-latest")
-        .WithPassword("YourStrong!Passw0rd")
+    private static readonly string MsSqlImage = GetRequiredEnvironmentVariable("TESTCONTAINERS_MSSQL_IMAGE");
+    private static readonly string RedisImage = GetRequiredEnvironmentVariable("TESTCONTAINERS_REDIS_IMAGE");
+    private static readonly string MsSqlPassword = GetRequiredEnvironmentVariable("TESTCONTAINERS_MSSQL_PASSWORD");
+
+    private readonly MsSqlContainer _sqlContainer = new MsSqlBuilder(MsSqlImage)
+        .WithPassword(MsSqlPassword)
         .Build();
 
-    private readonly RedisContainer _redisContainer = new RedisBuilder("redis:7-alpine")
+    private readonly RedisContainer _redisContainer = new RedisBuilder(RedisImage)
         .Build();
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -70,5 +74,11 @@ public sealed class IntegrationTestFactory : WebApplicationFactory<Program>, IAs
     {
         await _sqlContainer.DisposeAsync();
         await _redisContainer.DisposeAsync();
+    }
+
+    private static string GetRequiredEnvironmentVariable(string key)
+    {
+        var value = Environment.GetEnvironmentVariable(key);
+        return !string.IsNullOrWhiteSpace(value) ? value : throw new InvalidOperationException($"Required environment variable '{key}' was not provided.");
     }
 }
