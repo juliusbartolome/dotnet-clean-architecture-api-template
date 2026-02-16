@@ -18,12 +18,29 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Detect relevant changes
+        id: changes
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            dotnet:
+              - 'src/**'
+              - 'tests/**'
+              - '.github/workflows/ci.yml'
+              - '*.sln'
+              - '**/*.csproj'
+              - 'Directory.Build.props'
+              - 'Directory.Build.targets'
+              - 'global.json'
+
       - name: Setup .NET
+        if: steps.changes.outputs.dotnet == 'true'
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 9.0.x
 
       - name: Cache NuGet
+        if: steps.changes.outputs.dotnet == 'true'
         uses: actions/cache@v4
         with:
           path: ~/.nuget/packages
@@ -32,22 +49,25 @@ jobs:
             ${{ runner.os }}-nuget-
 
       - name: Restore
+        if: steps.changes.outputs.dotnet == 'true'
         run: dotnet restore dotnet-clean-architecture-api-template.sln
 
       - name: Build
+        if: steps.changes.outputs.dotnet == 'true'
         run: dotnet build dotnet-clean-architecture-api-template.sln --configuration Release --no-restore
 
       - name: Unit tests
+        if: steps.changes.outputs.dotnet == 'true'
         run: dotnet test tests/Template.UnitTests/Template.UnitTests.csproj --configuration Release --no-build
 
       - name: Pre-pull integration test images
-        if: ${{ env.ACT != 'true' }}
+        if: steps.changes.outputs.dotnet == 'true' && env.ACT != 'true'
         run: |
           docker pull "$TESTCONTAINERS_MSSQL_IMAGE"
           docker pull "$TESTCONTAINERS_REDIS_IMAGE"
 
       - name: Integration tests
-        if: ${{ env.ACT != 'true' }}
+        if: steps.changes.outputs.dotnet == 'true' && env.ACT != 'true'
         env:
           TESTCONTAINERS_WAIT_STRATEGY_TIMEOUT: 00:03:00
         run: dotnet test tests/Template.IntegrationTests/Template.IntegrationTests.csproj --configuration Release --no-build
