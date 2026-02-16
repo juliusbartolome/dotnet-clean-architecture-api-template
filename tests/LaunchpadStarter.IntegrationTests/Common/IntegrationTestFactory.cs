@@ -14,9 +14,13 @@ namespace LaunchpadStarter.IntegrationTests.Common;
 
 public sealed class IntegrationTestFactory : WebApplicationFactory<Program>, IAsyncLifetime
 {
-    private static readonly string MsSqlImage = GetRequiredEnvironmentVariable("TESTCONTAINERS_MSSQL_IMAGE");
-    private static readonly string RedisImage = GetRequiredEnvironmentVariable("TESTCONTAINERS_REDIS_IMAGE");
-    private static readonly string MsSqlPassword = GetRequiredEnvironmentVariable("TESTCONTAINERS_MSSQL_PASSWORD");
+    private const string DefaultMsSqlImage = "mcr.microsoft.com/mssql/server:2022-latest";
+    private const string DefaultRedisImage = "redis:7-alpine";
+    private const string DefaultMsSqlPassword = "Your_strong_password123!";
+
+    private static readonly string MsSqlImage = GetEnvironmentVariableOrDefault("TESTCONTAINERS_MSSQL_IMAGE", DefaultMsSqlImage);
+    private static readonly string RedisImage = GetEnvironmentVariableOrDefault("TESTCONTAINERS_REDIS_IMAGE", DefaultRedisImage);
+    private static readonly string MsSqlPassword = GetEnvironmentVariableOrDefault("TESTCONTAINERS_MSSQL_PASSWORD", DefaultMsSqlPassword);
 
     private readonly MsSqlContainer _sqlContainer = new MsSqlBuilder(MsSqlImage)
         .WithPassword(MsSqlPassword)
@@ -76,9 +80,9 @@ public sealed class IntegrationTestFactory : WebApplicationFactory<Program>, IAs
         await _redisContainer.DisposeAsync();
     }
 
-    private static string GetRequiredEnvironmentVariable(string key)
+    private static string GetEnvironmentVariableOrDefault(string key, string defaultValue)
     {
         var value = Environment.GetEnvironmentVariable(key);
-        return !string.IsNullOrWhiteSpace(value) ? value : throw new InvalidOperationException($"Required environment variable '{key}' was not provided.");
+        return !string.IsNullOrWhiteSpace(value) ? value : defaultValue;
     }
 }
