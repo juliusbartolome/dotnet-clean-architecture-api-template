@@ -1,6 +1,6 @@
 # dotnet-clean-architecture-api-launchpad-starter
 
-Production-oriented .NET 9 Web API launchpad starter using Clean Architecture, CQRS, validation pipelines, SQL Server/SQLite + Redis, JWT auth, structured logging, health checks, Docker, and CI.
+Production-oriented .NET 9 Web API launchpad starter using Clean Architecture, CQRS, validation pipelines, SQL Server + Redis, JWT auth, structured logging, health checks, Docker, and CI.
 
 ## Architecture
 
@@ -21,7 +21,7 @@ Production-oriented .NET 9 Web API launchpad starter using Clean Architecture, C
                     │ abstractions
 ┌───────────────────▼──────────────────────┐
 │       LaunchpadStarter.Infrastructure    │
-│  - EF Core (SQL Server/SQLite)           │
+│  - EF Core (SQL Server)                  │
 │  - Redis distributed cache               │
 │  - Health checks                         │
 └───────────────────┬──────────────────────┘
@@ -109,7 +109,7 @@ dotnet run --project src/LaunchpadStarter.Api/LaunchpadStarter.Api.csproj
 ### Environment variables
 
 ```bash
-# Required.
+# Required when running the API directly (without Docker Compose).
 export ConnectionStrings__DefaultConnection="Server=localhost,1433;Database=LaunchpadStarterDb;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=True"
 
 export ConnectionStrings__Redis="localhost:6379"
@@ -143,8 +143,16 @@ If you prefer machine-specific values, use `.env.local`:
 docker compose --env-file .env.local up --build
 ```
 
-Required variables for compose startup:
+Variables currently used by compose:
+- `ASPNETCORE_ENVIRONMENT`
+- `MSSQL_IMAGE`
+- `REDIS_IMAGE`
+- `DB_NAME`
+- `DB_USER`
 - `DB_PASSWORD`
+- `REDIS_CONNECTION`
+- `JWT_ISSUER`
+- `JWT_AUDIENCE`
 - `JWT_SIGNING_KEY`
 
 ## Tests
@@ -158,6 +166,9 @@ dotnet test tests/LaunchpadStarter.IntegrationTests/LaunchpadStarter.Integration
 ```
 
 Integration tests require:
+- no required environment variables by default
+
+Optional overrides:
 - `TESTCONTAINERS_MSSQL_IMAGE`
 - `TESTCONTAINERS_REDIS_IMAGE`
 - `TESTCONTAINERS_MSSQL_PASSWORD`
