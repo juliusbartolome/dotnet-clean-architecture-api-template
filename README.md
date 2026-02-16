@@ -142,6 +142,18 @@ dotnet ef database update --project src/LaunchpadStarter.Infrastructure --startu
 docker compose up --build
 ```
 
+Compose reads variables from `.env` by default. This repository now includes local defaults there.
+
+If you prefer machine-specific values, use `.env.local`:
+
+```bash
+docker compose --env-file .env.local up --build
+```
+
+Required variables for compose startup:
+- `DB_PASSWORD`
+- `JWT_SIGNING_KEY`
+
 ## Tests
 
 ```bash

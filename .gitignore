@@ -41,7 +41,7 @@ coverage.*
 Thumbs.db
 
 # Environment files
-.env
+!.env
 .env.*
 
 # Docker local overrides

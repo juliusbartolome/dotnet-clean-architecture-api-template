@@ -5,12 +5,12 @@ services:
       dockerfile: Dockerfile
     container_name: launchpadstarter-api
     environment:
-      ASPNETCORE_ENVIRONMENT: Development
-      ConnectionStrings__DefaultConnection: Server=sqlserver,1433;Database=LaunchpadStarterDb;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=True
-      ConnectionStrings__Redis: redis:6379
-      Jwt__Issuer: LaunchpadStarter.Api
-      Jwt__Audience: LaunchpadStarter.Client
-      Jwt__SigningKey: dev-only-signing-key-change-this-to-at-least-32-characters
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Development}
+      ConnectionStrings__DefaultConnection: Server=sqlserver,1433;Database=${DB_NAME:-LaunchpadStarterDb};User Id=${DB_USER:-sa};Password=${DB_PASSWORD:?DB_PASSWORD is required};TrustServerCertificate=True
+      ConnectionStrings__Redis: ${REDIS_CONNECTION:-redis:6379}
+      Jwt__Issuer: ${JWT_ISSUER:-LaunchpadStarter.Api}
+      Jwt__Audience: ${JWT_AUDIENCE:-LaunchpadStarter.Client}
+      Jwt__SigningKey: ${JWT_SIGNING_KEY:?JWT_SIGNING_KEY is required}
     ports:
       - "8080:8080"
     depends_on:
@@ -18,21 +18,21 @@ services:
       - redis
 
   sqlserver:
-    image: mcr.microsoft.com/mssql/server:2022-latest
+    image: ${MSSQL_IMAGE:-mcr.microsoft.com/mssql/server:2022-latest}
     container_name: launchpadstarter-sqlserver
     environment:
       ACCEPT_EULA: "Y"
-      SA_PASSWORD: "YourStrong!Passw0rd"
+      SA_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
     ports:
       - "1433:1433"
     healthcheck:
-      test: ["CMD", "/opt/mssql-tools/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "YourStrong!Passw0rd", "-Q", "SELECT 1"]
+      test: ["CMD", "/opt/mssql-tools/bin/sqlcmd", "-S", "localhost", "-U", "${DB_USER:-sa}", "-P", "${DB_PASSWORD:?DB_PASSWORD is required}", "-Q", "SELECT 1"]
       interval: 10s
       timeout: 5s
       retries: 10
 
   redis:
-    image: redis:7-alpine
+    image: ${REDIS_IMAGE:-redis:7-alpine}
     container_name: launchpadstarter-redis
     ports:
       - "6379:6379"
