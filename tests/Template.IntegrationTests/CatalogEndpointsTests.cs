@@ -4,6 +4,8 @@ using System.Net.Http.Json;
 using System.Security.Claims;
 using System.Text;
 using FluentAssertions;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Template.IntegrationTests.Common;
 
@@ -12,6 +14,7 @@ namespace Template.IntegrationTests;
 public sealed class CatalogEndpointsTests(IntegrationTestFactory factory) : IClassFixture<IntegrationTestFactory>
 {
     private readonly HttpClient _client = factory.CreateClient();
+    private readonly IConfiguration _configuration = factory.Services.GetRequiredService<IConfiguration>();
 
     [Fact]
     public async Task CreateProduct_HappyPath_ShouldReturnCreated()
@@ -86,14 +89,18 @@ public sealed class CatalogEndpointsTests(IntegrationTestFactory factory) : ICla
         secondResponse.Headers.GetValues("X-Cache").Single().Should().Be("HIT");
     }
 
-    private static string GenerateToken()
+    private string GenerateToken()
     {
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("integration-tests-signing-key-at-least-32-characters"));
+        var issuer = _configuration["Jwt:Issuer"] ?? "Template.Api";
+        var audience = _configuration["Jwt:Audience"] ?? "Template.Client";
+        var signingKey = _configuration["Jwt:SigningKey"] ?? "replace-with-long-dev-key-please-change";
+
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(signingKey));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var token = new JwtSecurityToken(
-            issuer: "Template.Api",
-            audience: "Template.Client",
+            issuer: issuer,
+            audience: audience,
             claims: [new Claim("scope", "catalog.write")],
             expires: DateTime.UtcNow.AddMinutes(30),
             signingCredentials: credentials);
