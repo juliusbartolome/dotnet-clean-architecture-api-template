@@ -2,12 +2,17 @@ name: ci
 
 on:
   push:
-    branches: ["main", "master"]
+    branches: ["main"]
   pull_request:
 
 jobs:
   build-test:
     runs-on: ubuntu-latest
+    environment: ci
+    env:
+      TESTCONTAINERS_MSSQL_IMAGE: mcr.microsoft.com/mssql/server:2022-latest
+      TESTCONTAINERS_REDIS_IMAGE: redis:7-alpine
+      TESTCONTAINERS_MSSQL_PASSWORD: ${{ secrets.TESTCONTAINERS_MSSQL_PASSWORD }}
 
     steps:
       - name: Checkout
@@ -38,8 +43,8 @@ jobs:
       - name: Pre-pull integration test images
         if: ${{ env.ACT != 'true' }}
         run: |
-          docker pull mcr.microsoft.com/mssql/server:2022-CU14-ubuntu-22.04
-          docker pull redis:7-alpine
+          docker pull "$TESTCONTAINERS_MSSQL_IMAGE"
+          docker pull "$TESTCONTAINERS_REDIS_IMAGE"
 
       - name: Integration tests
         if: ${{ env.ACT != 'true' }}
