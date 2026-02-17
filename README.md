@@ -113,9 +113,9 @@ dotnet run --project src/LaunchpadStarter.Api/LaunchpadStarter.Api.csproj
 export ConnectionStrings__DefaultConnection="Server=localhost,1433;Database=LaunchpadStarterDb;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=True"
 
 export ConnectionStrings__Redis="localhost:6379"
-export Jwt__Issuer="LaunchpadStarter.Api"
-export Jwt__Audience="LaunchpadStarter.Client"
-export Jwt__SigningKey="dev-only-signing-key-change-this-to-at-least-32-characters"
+export JWT_ISSUER="LaunchpadStarter.Api"
+export JWT_AUDIENCE="LaunchpadStarter.Client"
+export JWT_SIGNING_KEY="dev-only-signing-key-change-this-to-at-least-32-characters"
 ```
 
 Notes:

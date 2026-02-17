@@ -4,9 +4,9 @@ public sealed class JwtOptions
 {
     public const string SectionName = "Jwt";
 
-    public string Issuer { get; init; } = "LaunchpadStarter.Api";
+    public required string Issuer { get; init; }
 
-    public string Audience { get; init; } = "LaunchpadStarter.Client";
+    public required string Audience { get; init; }
 
-    public string SigningKey { get; init; } = "replace-with-long-dev-key-please-change";
+    public required string SigningKey { get; init; }
 }

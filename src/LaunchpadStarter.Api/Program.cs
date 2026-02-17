@@ -47,7 +47,15 @@ builder.Services.AddRateLimiter(options =>
     });
 });
 
-var jwtOptions = builder.Configuration.GetSection(JwtOptions.SectionName).Get<JwtOptions>() ?? new JwtOptions();
+var jwtOptions = new JwtOptions
+{
+    Issuer = builder.Configuration["JWT_ISSUER"]
+             ?? throw new InvalidOperationException("Missing required configuration: JWT_ISSUER"),
+    Audience = builder.Configuration["JWT_AUDIENCE"]
+               ?? throw new InvalidOperationException("Missing required configuration: JWT_AUDIENCE"),
+    SigningKey = builder.Configuration["JWT_SIGNING_KEY"]
+                 ?? throw new InvalidOperationException("Missing required configuration: JWT_SIGNING_KEY")
+};
 builder.Services.AddSingleton(jwtOptions);
 
 builder.Services
