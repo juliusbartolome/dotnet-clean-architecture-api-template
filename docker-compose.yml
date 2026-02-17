@@ -8,9 +8,9 @@ services:
       ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Development}
       ConnectionStrings__DefaultConnection: Server=sqlserver,1433;Database=${DB_NAME:-LaunchpadStarterDb};User Id=${DB_USER:-sa};Password=${DB_PASSWORD:?DB_PASSWORD is required};TrustServerCertificate=True
       ConnectionStrings__Redis: ${REDIS_CONNECTION:-redis:6379}
-      JWT_ISSUER: ${JWT_ISSUER:-LaunchpadStarter.Api}
-      JWT_AUDIENCE: ${JWT_AUDIENCE:-LaunchpadStarter.Client}
-      JWT_SIGNING_KEY: ${JWT_SIGNING_KEY:?JWT_SIGNING_KEY is required}
+      Jwt__Issuer: ${JWT_ISSUER:-LaunchpadStarter.Api}
+      Jwt__Audience: ${JWT_AUDIENCE:-LaunchpadStarter.Client}
+      Jwt__SigningKey: ${JWT_SIGNING_KEY:?JWT_SIGNING_KEY is required}
     ports:
       - "8080:8080"
     depends_on:
