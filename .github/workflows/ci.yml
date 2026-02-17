@@ -67,8 +67,4 @@ jobs:
         if: steps.changes.outputs.dotnet == 'true'
         env:
           TESTCONTAINERS_WAIT_STRATEGY_TIMEOUT: 00:03:00
-          INTEGRATION_TEST_CONTAINERS_MSSQL_PASSWORD: ${{ secrets.INTEGRATION_TEST_CONTAINERS_MSSQL_PASSWORD }}
-          INTEGRATION_TEST_JWT_ISSUER: ${{ vars.INTEGRATION_TEST_JWT_ISSUER || 'LaunchpadStarter.Api' }}
-          INTEGRATION_TEST_JWT_AUDIENCE: ${{ vars.INTEGRATION_TEST_JWT_AUDIENCE || 'LaunchpadStarter.Client' }}
-          INTEGRATION_TEST_JWT_SIGNING_KEY: ${{ secrets.INTEGRATION_TEST_JWT_SIGNING_KEY }}
         run: dotnet test tests/LaunchpadStarter.IntegrationTests/LaunchpadStarter.IntegrationTests.csproj --configuration Release --no-build

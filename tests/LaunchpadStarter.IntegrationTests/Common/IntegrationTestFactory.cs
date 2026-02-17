@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
+using System.Security.Cryptography;
 using LaunchpadStarter.Infrastructure.Persistence;
 using Testcontainers.MsSql;
 using Testcontainers.Redis;
@@ -16,19 +17,15 @@ public sealed class IntegrationTestFactory : WebApplicationFactory<Program>, IAs
 {
     private const string DefaultMsSqlImage = "mcr.microsoft.com/mssql/server:2022-latest";
     private const string DefaultRedisImage = "redis:7-alpine";
-    private const string DefaultMsSqlPassword = "Your_strong_password123!";
     private const string DefaultTestEnvironment = "IntegrationTesting";
-    private const string DefaultJwtIssuer = "LaunchpadStarter.Api";
-    private const string DefaultJwtAudience = "LaunchpadStarter.Client";
-    private const string DefaultJwtSigningKey = "integration-tests-signing-key-at-least-32-characters";
+    private const string JwtIssuer = "LaunchpadStarter.Api";
+    private const string JwtAudience = "LaunchpadStarter.Client";
 
     private static readonly string MsSqlImage = GetEnvironmentVariableOrDefault("INTEGRATION_TEST_CONTAINERS_MSSQL_IMAGE", DefaultMsSqlImage);
     private static readonly string RedisImage = GetEnvironmentVariableOrDefault("INTEGRATION_TEST_CONTAINERS_REDIS_IMAGE", DefaultRedisImage);
-    private static readonly string MsSqlPassword = GetEnvironmentVariableOrDefault("INTEGRATION_TEST_CONTAINERS_MSSQL_PASSWORD", DefaultMsSqlPassword);
+    private static readonly string MsSqlPassword = GenerateStrongPassword();
     private static readonly string TestEnvironment = GetEnvironmentVariableOrDefault("INTEGRATION_TEST_ENVIRONMENT", DefaultTestEnvironment);
-    private static readonly string JwtIssuer = GetEnvironmentVariableOrDefault("INTEGRATION_TEST_JWT_ISSUER", DefaultJwtIssuer);
-    private static readonly string JwtAudience = GetEnvironmentVariableOrDefault("INTEGRATION_TEST_JWT_AUDIENCE", DefaultJwtAudience);
-    private static readonly string JwtSigningKey = GetEnvironmentVariableOrDefault("INTEGRATION_TEST_JWT_SIGNING_KEY", DefaultJwtSigningKey);
+    private static readonly string JwtSigningKey = GenerateJwtSigningKey();
 
     private readonly MsSqlContainer _sqlContainer = new MsSqlBuilder(MsSqlImage)
         .WithPassword(MsSqlPassword)
@@ -93,4 +90,10 @@ public sealed class IntegrationTestFactory : WebApplicationFactory<Program>, IAs
         var value = Environment.GetEnvironmentVariable(key);
         return !string.IsNullOrWhiteSpace(value) ? value : defaultValue;
     }
+
+    private static string GenerateStrongPassword()
+        => $"A!a1{Convert.ToHexString(RandomNumberGenerator.GetBytes(16))}";
+
+    private static string GenerateJwtSigningKey()
+        => $"it-jwt-{Convert.ToHexString(RandomNumberGenerator.GetBytes(32))}";
 }
