@@ -17,10 +17,18 @@ public sealed class IntegrationTestFactory : WebApplicationFactory<Program>, IAs
     private const string DefaultMsSqlImage = "mcr.microsoft.com/mssql/server:2022-latest";
     private const string DefaultRedisImage = "redis:7-alpine";
     private const string DefaultMsSqlPassword = "Your_strong_password123!";
+    private const string DefaultTestEnvironment = "IntegrationTesting";
+    private const string DefaultJwtIssuer = "LaunchpadStarter.Api";
+    private const string DefaultJwtAudience = "LaunchpadStarter.Client";
+    private const string DefaultJwtSigningKey = "integration-tests-signing-key-at-least-32-characters";
 
-    private static readonly string MsSqlImage = GetEnvironmentVariableOrDefault("TESTCONTAINERS_MSSQL_IMAGE", DefaultMsSqlImage);
-    private static readonly string RedisImage = GetEnvironmentVariableOrDefault("TESTCONTAINERS_REDIS_IMAGE", DefaultRedisImage);
-    private static readonly string MsSqlPassword = GetEnvironmentVariableOrDefault("TESTCONTAINERS_MSSQL_PASSWORD", DefaultMsSqlPassword);
+    private static readonly string MsSqlImage = GetEnvironmentVariableOrDefault("INTEGRATION_TEST_CONTAINERS_MSSQL_IMAGE", DefaultMsSqlImage);
+    private static readonly string RedisImage = GetEnvironmentVariableOrDefault("INTEGRATION_TEST_CONTAINERS_REDIS_IMAGE", DefaultRedisImage);
+    private static readonly string MsSqlPassword = GetEnvironmentVariableOrDefault("INTEGRATION_TEST_CONTAINERS_MSSQL_PASSWORD", DefaultMsSqlPassword);
+    private static readonly string TestEnvironment = GetEnvironmentVariableOrDefault("INTEGRATION_TEST_ENVIRONMENT", DefaultTestEnvironment);
+    private static readonly string JwtIssuer = GetEnvironmentVariableOrDefault("INTEGRATION_TEST_JWT_ISSUER", DefaultJwtIssuer);
+    private static readonly string JwtAudience = GetEnvironmentVariableOrDefault("INTEGRATION_TEST_JWT_AUDIENCE", DefaultJwtAudience);
+    private static readonly string JwtSigningKey = GetEnvironmentVariableOrDefault("INTEGRATION_TEST_JWT_SIGNING_KEY", DefaultJwtSigningKey);
 
     private readonly MsSqlContainer _sqlContainer = new MsSqlBuilder(MsSqlImage)
         .WithPassword(MsSqlPassword)
@@ -31,16 +39,16 @@ public sealed class IntegrationTestFactory : WebApplicationFactory<Program>, IAs
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        builder.UseEnvironment("IntegrationTesting");
+        builder.UseEnvironment(TestEnvironment);
         builder.ConfigureAppConfiguration((_, configBuilder) =>
         {
             var settings = new Dictionary<string, string?>
             {
                 ["ConnectionStrings:DefaultConnection"] = _sqlContainer.GetConnectionString(),
                 ["ConnectionStrings:Redis"] = $"{_redisContainer.Hostname}:{_redisContainer.GetMappedPublicPort(6379)}",
-                ["Jwt:Issuer"] = "LaunchpadStarter.Api",
-                ["Jwt:Audience"] = "LaunchpadStarter.Client",
-                ["Jwt:SigningKey"] = "integration-tests-signing-key-at-least-32-characters"
+                ["Jwt:Issuer"] = JwtIssuer,
+                ["Jwt:Audience"] = JwtAudience,
+                ["Jwt:SigningKey"] = JwtSigningKey
             };
 
             configBuilder.AddInMemoryCollection(settings);

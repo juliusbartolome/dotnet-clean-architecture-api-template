@@ -159,9 +159,13 @@ Variables currently used by compose:
 
 ```bash
 dotnet test tests/LaunchpadStarter.UnitTests/LaunchpadStarter.UnitTests.csproj
-TESTCONTAINERS_MSSQL_IMAGE="mcr.microsoft.com/mssql/server:2022-latest" \
-TESTCONTAINERS_REDIS_IMAGE="redis:7-alpine" \
-TESTCONTAINERS_MSSQL_PASSWORD="YourStrong!Passw0rd" \
+INTEGRATION_TEST_CONTAINERS_MSSQL_IMAGE="mcr.microsoft.com/mssql/server:2022-latest" \
+INTEGRATION_TEST_CONTAINERS_REDIS_IMAGE="redis:7-alpine" \
+INTEGRATION_TEST_CONTAINERS_MSSQL_PASSWORD="YourStrong!Passw0rd" \
+INTEGRATION_TEST_JWT_ISSUER="LaunchpadStarter.Api" \
+INTEGRATION_TEST_JWT_AUDIENCE="LaunchpadStarter.Client" \
+INTEGRATION_TEST_JWT_SIGNING_KEY="integration-tests-signing-key-at-least-32-characters" \
+INTEGRATION_TEST_ENVIRONMENT="IntegrationTesting" \
 dotnet test tests/LaunchpadStarter.IntegrationTests/LaunchpadStarter.IntegrationTests.csproj
 ```
 
@@ -169,15 +173,24 @@ Integration tests require:
 - no required environment variables by default
 
 Optional overrides:
-- `TESTCONTAINERS_MSSQL_IMAGE`
-- `TESTCONTAINERS_REDIS_IMAGE`
-- `TESTCONTAINERS_MSSQL_PASSWORD`
+- `INTEGRATION_TEST_CONTAINERS_MSSQL_IMAGE`
+- `INTEGRATION_TEST_CONTAINERS_REDIS_IMAGE`
+- `INTEGRATION_TEST_CONTAINERS_MSSQL_PASSWORD`
+- `INTEGRATION_TEST_JWT_ISSUER`
+- `INTEGRATION_TEST_JWT_AUDIENCE`
+- `INTEGRATION_TEST_JWT_SIGNING_KEY`
+- `INTEGRATION_TEST_ENVIRONMENT`
 
 ## CI
 
 - CI runs on pushes to `main` and on pull requests.
 - Workflow uses GitHub Environment `ci`.
-- Define `TESTCONTAINERS_MSSQL_PASSWORD` in the `ci` environment secrets.
+- Set `vars.INTEGRATION_TEST_CONTAINERS_MSSQL_IMAGE` (optional, default `mcr.microsoft.com/mssql/server:2022-latest`).
+- Set `vars.INTEGRATION_TEST_CONTAINERS_REDIS_IMAGE` (optional, default `redis:7-alpine`).
+- Set `vars.INTEGRATION_TEST_JWT_ISSUER` (optional, default `LaunchpadStarter.Api`).
+- Set `vars.INTEGRATION_TEST_JWT_AUDIENCE` (optional, default `LaunchpadStarter.Client`).
+- Set `secrets.INTEGRATION_TEST_CONTAINERS_MSSQL_PASSWORD`.
+- Set `secrets.INTEGRATION_TEST_JWT_SIGNING_KEY`.
 
 ## Key decisions
 

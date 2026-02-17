@@ -9,10 +9,6 @@ jobs:
   build-test:
     runs-on: ubuntu-latest
     environment: ci
-    env:
-      TESTCONTAINERS_MSSQL_IMAGE: mcr.microsoft.com/mssql/server:2022-latest
-      TESTCONTAINERS_REDIS_IMAGE: redis:7-alpine
-      TESTCONTAINERS_MSSQL_PASSWORD: ${{ secrets.TESTCONTAINERS_MSSQL_PASSWORD }}
 
     steps:
       - name: Checkout
@@ -62,13 +58,17 @@ jobs:
         run: dotnet test tests/LaunchpadStarter.UnitTests/LaunchpadStarter.UnitTests.csproj --configuration Release --no-build
 
       - name: Pre-pull integration test images
-        if: steps.changes.outputs.dotnet == 'true' && env.ACT != 'true'
+        if: steps.changes.outputs.dotnet == 'true'
         run: |
-          docker pull "$TESTCONTAINERS_MSSQL_IMAGE"
-          docker pull "$TESTCONTAINERS_REDIS_IMAGE"
+          docker pull "${{ vars.INTEGRATION_TEST_CONTAINERS_MSSQL_IMAGE || 'mcr.microsoft.com/mssql/server:2022-latest' }}"
+          docker pull "${{ vars.INTEGRATION_TEST_CONTAINERS_REDIS_IMAGE || 'redis:7-alpine' }}"
 
       - name: Integration tests
-        if: steps.changes.outputs.dotnet == 'true' && env.ACT != 'true'
+        if: steps.changes.outputs.dotnet == 'true'
         env:
           TESTCONTAINERS_WAIT_STRATEGY_TIMEOUT: 00:03:00
+          INTEGRATION_TEST_CONTAINERS_MSSQL_PASSWORD: ${{ secrets.INTEGRATION_TEST_CONTAINERS_MSSQL_PASSWORD }}
+          INTEGRATION_TEST_JWT_ISSUER: ${{ vars.INTEGRATION_TEST_JWT_ISSUER || 'LaunchpadStarter.Api' }}
+          INTEGRATION_TEST_JWT_AUDIENCE: ${{ vars.INTEGRATION_TEST_JWT_AUDIENCE || 'LaunchpadStarter.Client' }}
+          INTEGRATION_TEST_JWT_SIGNING_KEY: ${{ secrets.INTEGRATION_TEST_JWT_SIGNING_KEY }}
         run: dotnet test tests/LaunchpadStarter.IntegrationTests/LaunchpadStarter.IntegrationTests.csproj --configuration Release --no-build
